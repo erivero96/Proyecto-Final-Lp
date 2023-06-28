@@ -3,14 +3,17 @@
     cont = cont+1;
 
 
-ofstream archivo("venta.txt");
+    ofstream archivo("venta.txt");
     if (archivo.is_open())
     {
-        archivo<<"Venta"<<cont<<endl;
+        archivo<<"Venta 00 "<<cont<<endl;
         archivo<<"Cliente"<<cliente->nombre<<endl;
         archivo<<"Fecha 28/06/2023"<<endl;
         archivo<<"Cod"<<codigoProducto<<endl;
         archivo<<"Producto"<<producto->descripcion<<endl;
+        archivo<<"Cantidad"<<producto->capacidad<<endl;
+        archivo<<"Precio Unit"<<producto->precio<<endl;
+        archivo<<"Subtotal"<<producto->capacidad*producto->precio<<endl;
         archivo.close();
     }
     else
@@ -18,5 +21,4 @@ ofstream archivo("venta.txt");
         cout<<"No se pudo abrir el archivo"<<endl;
     }   
 }
-
 //imprimir en txt
