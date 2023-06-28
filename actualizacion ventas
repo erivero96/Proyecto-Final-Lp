@@ -1,4 +1,9 @@
-    ofstream archivo("venta.txt");
+    int cont;
+    cont = 0;
+    cont = cont+1;
+
+
+ofstream archivo("venta.txt");
     if (archivo.is_open())
     {
         archivo<<"Venta"<<cont<<endl;
