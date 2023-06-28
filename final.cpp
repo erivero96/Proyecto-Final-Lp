@@ -2,6 +2,7 @@
 #include <string>
 #include <limits>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -36,8 +37,8 @@ public:
     string direccion;
 
     Cliente() {}
-    Cliente(string email, string clave, int codigo, string nombre, int telefono, char categoria, int ruc, string direccion) : Persona(email, clave, codigo, nombre, telefono) {
-        this->categoria = categoria;
+    Cliente(string email, string clave, int codigo, string nombre, int telefono, int ruc, string direccion) : Persona(email, clave, codigo, nombre, telefono) {
+        this->categoria = 'C';
         this->ruc = ruc;
         this->direccion = direccion;
         numeroClientes += 1;
@@ -47,10 +48,7 @@ public:
         o << "- Cliente: " << cliente.nombre << " " << cliente.codigo << " " << cliente.telefono << " " << cliente.categoria << " " << cliente.ruc << " " << cliente.direccion << endl;
         return o;
     }
-
-    void asignarCategoria() {
-        // Completar asignacion de categoria
-    }
+    virtual void asignarCategoria() = 0;
 };
 
 int Cliente::numeroClientes = 0;
@@ -58,16 +56,31 @@ int Cliente::numeroClientes = 0;
 class ClienteIndividual : public Cliente {
 public:
     ClienteIndividual() {}
-    ClienteIndividual(string email, string clave, int codigo, string nombre, int telefono, char categoria, int ruc, string direccion) : Cliente(email, clave, codigo, nombre, telefono, categoria, ruc, direccion) {
+    ClienteIndividual(string email, string clave, int codigo, string nombre, int telefono, int ruc, string direccion) : Cliente(email, clave, codigo, nombre, telefono, ruc, direccion) {
         this->tasaDescuento = 0.03;
+    }
+
+    void asignarCategoria() {
+        cout << "Ingrese la categoria: ";
+        while(categoria != 'A' or categoria !='B' or categoria != 'D' ){
+            cin >> categoria;
+        }
+        
     }
 };
 
 class ClienteCorporativo : public Cliente {
 public:
     ClienteCorporativo() {}
-    ClienteCorporativo(string email, string clave, int codigo, string nombre, int telefono, char categoria, int ruc, string direccion) : Cliente(email, clave, codigo, nombre, telefono, categoria, ruc, direccion) {
+    ClienteCorporativo(string email, string clave, int codigo, string nombre, int telefono, int ruc, string direccion) : Cliente(email, clave, codigo, nombre, telefono, ruc, direccion) {
         this->tasaDescuento = 0.10;
+    }
+
+    void asignarCategoria() {
+        cout << "Ingrese la categoria: ";
+        while(categoria != 'A' or categoria !='B' ){
+            cin >> categoria;
+        }
     }
 };
 
@@ -114,12 +127,18 @@ void limpiarPantalla() {
 
 int obtenerOpcion() {
     int opcion;
-    while (!(cin >> opcion)) {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Opción inválida. Intente nuevamente: ";
+    bool opcionValida = false;
+
+    while (!opcionValida) {
+        if (cin >> opcion) {
+            opcionValida = true;
+        } else {
+            cout << "Opción inválida. Intente nuevamente: ";
+            cin.clear();
+            cin.ignore(10000, '\n');
+        }
     }
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
     return opcion;
 }
 
@@ -131,7 +150,6 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
     int codigo;
     string nombre;
     int telefono;
-    char categoria;
     int ruc;
     string direccion;
     int dni;
@@ -157,8 +175,6 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
         cin >> dni;
         cout << "Telefono: ";
         cin >> telefono;
-        cout << "Categoria: ";
-        cin >> categoria;
         cout << "Ruc: ";
         cin >> ruc;
         cout << "Direccion: ";
@@ -190,7 +206,7 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
             break;
         }
 
-        c = new ClienteCorporativo(email, clave, codigo, nombre, telefono, categoria, ruc, direccion);
+        c = new ClienteCorporativo(email, clave, codigo, nombre, telefono, ruc, direccion);
         clientes.push_back(c);
         break;
     }
@@ -207,16 +223,38 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
         cin >> nombre;
         cout << "Telefono: ";
         cin >> telefono;
-        cout << "Categoria: ";
-        cin >> categoria;
         cout << "Ruc: ";
         cin >> ruc;
         cout << "Direccion: ";
         cin.ignore();
         getline(cin, direccion);
 
-        c = new ClienteIndividual(email, clave, codigo, nombre, telefono, categoria, ruc, direccion);
+        c = new ClienteIndividual(email, clave, codigo, nombre, telefono, ruc, direccion);
         clientes.push_back(c);
+        // Validar si el cliente ya está registrado por DNI y Nombre
+        for (auto& it : clientes) {
+            if (it->nombre == nombre) {
+                cout << "El cliente ya existe en la base de datos";
+                return;
+            }
+        }
+
+        // Validar tamaño del RUC (11 dígitos)
+        while (ruc <= 9999999999 or ruc > 99999999999) {
+            cout << "El RUC debe tener 11 dígitos. Ingrese nuevamente: ";
+            cin >> ruc;
+        }
+
+        // Validar tamaño del teléfono (9 dígitos)
+        while (telefono < 99999999 or telefono > 999999999) {
+            cout << "El teléfono debe tener 9 dígitos. Ingrese nuevamente: ";
+            cin >> telefono;
+        }
+
+        if (Cliente::numeroClientes >= 6) {
+            cout << "Agenda llena. No se puede agregar más clientes." << endl;
+            break;
+        }
         break;
     }
 
@@ -304,8 +342,9 @@ void agregarNuevoProducto(vector<Producto>& productos) {
     productos.push_back(nuevoProducto);
     cout << "Se agregó el nuevo producto." << endl;
 }
-
+int cont = 0 ;
 void realizarVenta(vector<Cliente*>& clientes, vector<Vendedor>& vendedores, vector<Producto>& productos) {
+    cont = cont+1;
     int codigoCliente;
     cout << "Ingrese el código del cliente: ";
     cin >> codigoCliente;
@@ -364,8 +403,25 @@ void realizarVenta(vector<Cliente*>& clientes, vector<Vendedor>& vendedores, vec
     }
 
     cout << "Realizando venta..." << endl;
-    // Lógica para realizar la venta
+
+
+    ofstream archivo("venta.txt");
+    if (archivo.is_open())
+    {
+        archivo<<"Venta"<<cont<<endl;
+        archivo<<"Cliente"<<cliente->nombre<<endl;
+        archivo<<"Fecha 28/06/2023"<<endl;
+        archivo<<"Cod"<<codigoProducto<<endl;
+        archivo<<"Producto"<<producto->descripcion<<endl;
+        archivo.close();
+    }
+    else
+    {
+        cout<<"No se pudo abrir el archivo"<<endl;
+    }   
 }
+
+//imprimir en txt
 
 int main() {
     vector<Cliente*> clientes;
