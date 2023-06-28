@@ -1,0 +1,16 @@
+int obtenerOpcion() {
+    int opcion;
+    bool opcionValida = false;
+
+    while (!opcionValida) {
+        if (cin >> opcion) {
+            opcionValida = true;
+        } else {
+            cout << "Opción inválida. Intente nuevamente: ";
+            cin.clear();
+            cin.ignore(10000, '\n');
+        }
+    }
+
+    return opcion;
+}
