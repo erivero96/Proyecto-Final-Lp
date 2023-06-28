@@ -1,0 +1,17 @@
+    ofstream archivo("venta.txt");
+    if (archivo.is_open())
+    {
+        archivo<<"Venta"<<cont<<endl;
+        archivo<<"Cliente"<<cliente->nombre<<endl;
+        archivo<<"Fecha 28/06/2023"<<endl;
+        archivo<<"Cod"<<codigoProducto<<endl;
+        archivo<<"Producto"<<producto->descripcion<<endl;
+        archivo.close();
+    }
+    else
+    {
+        cout<<"No se pudo abrir el archivo"<<endl;
+    }   
+}
+
+//imprimir en txt
