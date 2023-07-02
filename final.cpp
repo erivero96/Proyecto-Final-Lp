@@ -467,16 +467,26 @@ void ordenarLista(vector <T> x) {
     sort(x.begin(), x.end(), compararPorCodigo);
 }
 
-void mostrarProductos(vector <Producto>& x) {
-    for (auto i : x) {
-
+void mostrarProductos(const vector<Producto>& productos) {
+    cout << "|--------------|" << "----------------------------|" << "---------------------|" << endl;
+    cout << "|   Codigo     |" << "        Descripcion         |" << "         Precio      |" << endl;
+    cout << "|--------------|" << "----------------------------|" << "---------------------|" << endl;
+    
+    for(const auto& producto : productos) {
+        cout << "|        " << producto.codigo << "     |" << "      " << producto.descripcion << "       |"<<"          " << producto.precio << "       |" << endl;
+        cout << "|-----------------------------|" << "---------------------------|" << "---------------------|" << endl;
     }
-
 }
 
-void mostrarVendedores(vector <Vendedor>& x) {
-    for (auto i : x) {
 
+void mostrarVendedores(const vector<Vendedor>& vendedores) {
+    cout << "+--------------+" << "----------------------------+" << "---------------------+" <<endl;
+    cout << "|   Codigo     |" << "          Nombre            |" << "       Salario       |" <<endl;
+    cout << "+--------------+" << "----------------------------+" << "---------------------+" <<endl;
+
+    for (const auto& vendedor : vendedores) {
+        cout << "|     "<< vendedor.codigo << "     |"<< "      "<<vendedor.nombre << "              |"<< "       " << vendedor.salario << "        |"<<endl;
+        cout << "+--------------+" << "----------------------------+" << "---------------------+" << "--------------+" << endl;
     }
 }
 
