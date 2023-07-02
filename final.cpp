@@ -359,7 +359,7 @@ void agregarNuevoProducto(vector<Producto>& productos) {
 }
 int cont = 0 ;
 
-void realizarVenta(vector<Cliente*>& clientes, vector<Vendedor>& vendedores, vector<Producto>& productos) {
+void realizarVenta(vector<Cliente*>& clientes, vector<Producto>& productos) {
     cont = cont+1;
     int codigoCliente;
     cout << "Ingrese el código del cliente: ";
@@ -377,25 +377,6 @@ void realizarVenta(vector<Cliente*>& clientes, vector<Vendedor>& vendedores, vec
 
     if (!clienteExistente) {
         cout << "El cliente no existe en la lista." << endl;
-        return;
-    }
-
-    int codigoVendedor;
-    cout << "Ingrese el código del vendedor: ";
-    cin >> codigoVendedor;
-
-    bool vendedorExistente = false;
-    Vendedor* vendedor;
-    for (auto& v : vendedores) {
-        if (v.codigo == codigoVendedor) {
-            vendedorExistente = true;
-            vendedor = &v;
-            break;
-        }
-    }
-
-    if (!vendedorExistente) {
-        cout << "El vendedor no existe en la lista." << endl;
         return;
     }
 
@@ -446,14 +427,14 @@ vector <Cliente*> ordenarClientes(vector <Cliente*> x) {
 }
 
 void mostrarClientes(vector <Cliente*>& x) {
-    cout << "|------------------|" << "--------------------|" << "-----------------|" <<endl;
-    cout << "|      Codigo      |" << "      Telefono      |" << "    Categoria    |" << endl;
-    cout << "|------------------|" << "--------------------|" << "-----------------|" << endl; 
+    cout << "+------------------+" << "--------------------+" << "-----------------+" << "-----------------------+" << endl; 
+    cout << "|      Codigo      |" << "      Telefono      |" << "    Categoria    |" << "          RUC          |" << endl;
+    cout << "+------------------+" << "--------------------+" << "-----------------+" << "-----------------------+"  << endl; 
     x = ordenarClientes(x);
     for(auto i : x) {
         
-        cout <<"|       "<< i->codigo  <<"       |"<< "     "<< i->telefono  <<"      |" <<"        "<< i->categoria  <<"        |" <<endl;
-        cout << "|------------------|" << "--------------------|" << "-----------------|" <<endl;
+        cout <<"|       "<< i->codigo  <<"       |"<< "     "<< i->telefono  <<"      |" <<"        "<< i->categoria  <<"        |" <<"      "<<i->ruc<< "      |"<< endl;
+        cout << "+------------------+" << "--------------------+" << "-----------------+"  << "-----------------------+"  <<endl; 
     }
 }
 
@@ -463,15 +444,21 @@ bool compararPorCodigo(const T& x1, const T& x2) {
 }
 
 template <typename T> 
-void ordenarLista(vector <T> x) {
+void ordenarListaAscendente(vector <T> x) {
     sort(x.begin(), x.end(), compararPorCodigo);
 }
 
+template <typename T> 
+void ordenarListaDescendente(vector <T> x) {
+    sort(x.end(), x.begin() , compararPorCodigo);
+}
+
+
 void mostrarProductos(const vector<Producto>& productos) {
-    cout << "|--------------|" << "----------------------------|" << "---------------------|" << endl;
+    cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
     cout << "|   Codigo     |" << "        Descripcion         |" << "         Precio      |" << endl;
-    cout << "|--------------|" << "----------------------------|" << "---------------------|" << endl;
-    
+    cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
+
     for(const auto& producto : productos) {
         cout << "|        " << producto.codigo << "     |" << "      " << producto.descripcion << "       |"<<"          " << producto.precio << "       |" << endl;
         cout << "|-----------------------------|" << "---------------------------|" << "---------------------|" << endl;
@@ -498,9 +485,9 @@ int main() {
     vector<Vendedor> vendedores;
     vector<Producto> productos;
 
-    Cliente* c1 = new ClienteIndividual("cliente1@example.com", "clave1", "Cliente 1", 123456789, "12345", "Dirección 1");
-    Cliente* c2 = new ClienteCorporativo("cliente2@example.com", "clave2", "Cliente 2", 987654321, "54321", "Dirección 2");
-    Cliente* c3 = new ClienteIndividual("cliente3@example.com", "clave3", "Cliente 3", 955987654, "12345", "Dirección 3");
+    Cliente* c1 = new ClienteIndividual("cliente1@example.com", "clave1", "Cliente 1", 123456789, "12345678921", "Dirección 1");
+    Cliente* c2 = new ClienteCorporativo("cliente2@example.com", "clave2", "Cliente 2", 987654321,"54321678912", "Dirección 2");
+    Cliente* c3 = new ClienteIndividual("cliente3@example.com", "clave3", "Cliente 3", 955987654, "12345567892", "Dirección 3");
 
     clientes.push_back(c3);
     clientes.push_back(c1);
@@ -535,7 +522,7 @@ int main() {
             agregarNuevoProducto(productos);
             break;
         case 5:
-            realizarVenta(clientes, vendedores, productos);
+            realizarVenta(clientes, productos);
             break;
         case 6:
             mostrarClientes(clientes);
