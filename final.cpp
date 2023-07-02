@@ -21,7 +21,6 @@ public:
     Persona(string email, string clave, string nombre, int telefono) {
         this->email = email;
         this->clave = clave;
-        this->codigo = 1000;
         this->nombre = nombre;
         this->telefono = telefono;
     }
@@ -35,6 +34,7 @@ public:
     string tipo;
     int stock;
     int capacidad;
+    static int numeroProductos;
 
     Producto() {}
     Producto(int codigo, string descripcion, double precio, string tipo, int stock, int capacidad) {
@@ -44,8 +44,11 @@ public:
         this->tipo = tipo;
         this->stock = stock;
         this->capacidad = capacidad;
+        codigo = 3000 + numeroProductos;
     }
 };
+
+int Producto::numeroProductos = 0;
 
 
 class Cliente : public Persona {
@@ -57,16 +60,16 @@ public:
 
     static int numeroClientes;
     char categoria;
-    int ruc;
+    string ruc;
     string direccion;
 
     Cliente() {}
-    Cliente(string email, string clave, string nombre, int telefono, int ruc, string direccion) : Persona(email, clave, nombre, telefono) {
+    Cliente(string email, string clave, string nombre, int telefono, string ruc, string direccion) : Persona(email, clave, nombre, telefono) {
         this->categoria = 'C';
         this->ruc = ruc;
         this->direccion = direccion;
         numeroClientes += 1;
-        codigo += numeroClientes;
+        codigo = 1000 + numeroClientes;
     }
 
     friend ostream& operator<<(ostream& o, const Cliente& cliente) {
@@ -86,7 +89,7 @@ int Cliente::numeroClientes = 0;
 class ClienteIndividual : public Cliente {
 public:
     ClienteIndividual() {}
-    ClienteIndividual(string email, string clave, string nombre, int telefono, int ruc, string direccion) : Cliente(email, clave, nombre, telefono, ruc, direccion) {
+    ClienteIndividual(string email, string clave, string nombre, int telefono, string ruc, string direccion) : Cliente(email, clave, nombre, telefono, ruc, direccion) {
         this->tasaDescuento = 0.03;
     }
 
@@ -102,7 +105,7 @@ public:
 class ClienteCorporativo : public Cliente {
 public:
     ClienteCorporativo() {}
-    ClienteCorporativo(string email, string clave, string nombre, int telefono, int ruc, string direccion) : Cliente(email, clave, nombre, telefono, ruc, direccion) {
+    ClienteCorporativo(string email, string clave, string nombre, int telefono, string ruc, string direccion) : Cliente(email, clave, nombre, telefono, ruc, direccion) {
         this->tasaDescuento = 0.10;
     }
 
@@ -126,6 +129,7 @@ public:
         this->nombre = nombre;
         this->salario = salario;
         numeroVendedores += 1;
+        codigo = 2000 + numeroVendedores;
     }
 };
 
@@ -161,115 +165,119 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
     int codigo;
     string nombre;
     int telefono;
-    int ruc;
+    string ruc;
     string direccion;
     int dni;
+    if (Cliente::numeroClientes <= 6)
+    {
+        cout << "Elija el tipo de cliente" << endl;
+            cout << "1. Cliente Corporativo" << endl;
+            cout << "2. Cliente Individual" << endl;
+            cout << "Elija una opcion: ";
+            cin >> opc;
 
-    cout << "Elija el tipo de cliente" << endl;
-    cout << "1. Cliente Corporativo" << endl;
-    cout << "2. Cliente Individual" << endl;
-    cout << "Elija una opcion: ";
-    cin >> opc;
+            switch (opc) {
+                case '1': {
+                    cout << "Ingrese los datos del cliente corporativo" << endl;
+                    cout << "Email: ";
+                    cin >> email;
+                    cout << "Clave: ";
+                    cin >> clave;
+                    cout << "Nombre: ";
+                    cin >> nombre;
+                    cout << "Dni: ";
+                    cin >> dni;
+                    cout << "Telefono: ";
+                    cin >> telefono;
+                    cout << "Ruc: ";
+                    cin >> ruc;
+                    cout << "Direccion: ";
+                    cin.ignore();
+                    getline(cin, direccion);
 
-    switch (opc) {
-    case '1': {
-        cout << "Ingrese los datos del cliente corporativo" << endl;
-        cout << "Email: ";
-        cin >> email;
-        cout << "Clave: ";
-        cin >> clave;
-        cout << "Nombre: ";
-        cin >> nombre;
-        cout << "Dni: ";
-        cin >> dni;
-        cout << "Telefono: ";
-        cin >> telefono;
-        cout << "Ruc: ";
-        cin >> ruc;
-        cout << "Direccion: ";
-        cin.ignore();
-        getline(cin, direccion);
+                    // Validar si el cliente ya está registrado por DNI y Nombre
+                    for (auto& it : clientes) {
+                        if (it->nombre == nombre) {
+                            cout << "El cliente ya existe en la base de datos";
+                            return;
+                        }
+                    }
 
-        // Validar si el cliente ya está registrado por DNI y Nombre
-        for (auto& it : clientes) {
-            if (it->nombre == nombre) {
-                cout << "El cliente ya existe en la base de datos";
-                return;
+                    // Validar tamaño del RUC (11 dígitos)
+                    while (ruc.length() != 11) {
+                        cout << "El RUC debe tener 11 dígitos. Ingrese nuevamente: ";
+                        cin >> ruc;
+                    }
+
+                    // Validar tamaño del teléfono (9 dígitos)
+                    while (telefono < 99999999 or telefono > 999999999) {
+                        cout << "El teléfono debe tener 9 dígitos. Ingrese nuevamente: ";
+                        cin >> telefono;
+                    }
+
+                    if (Cliente::numeroClientes >= 6) {
+                        cout << "Agenda llena. No se puede agregar más clientes." << endl;
+                        break;
+                    }
+                    
+                    c = new ClienteCorporativo(email, clave, nombre, telefono, ruc, direccion);
+                    clientes.push_back(c);
+                    break;
+                }
+
+                case '2': {
+                    cout << "Ingrese los datos del cliente individual" << endl;
+                    cout << "Email: ";
+                    cin >> email;
+                    cout << "Clave: ";
+                    cin >> clave;
+                    cout << "Nombre: ";
+                    cin >> nombre;
+                    cout << "Telefono: ";
+                    cin >> telefono;
+                    cout << "Ruc: ";
+                    cin >> ruc;
+                    cout << "Direccion: ";
+                    cin.ignore();
+                    getline(cin, direccion);
+
+
+                    // Validar si el cliente ya está registrado por DNI y Nombre
+                    for (auto& it : clientes) {
+                        if (it->nombre == nombre) {
+                            cout << "El cliente ya existe en la base de datos";
+                            return;
+                        }
+                    }
+
+                    // Validar tamaño del RUC (11 dígitos)
+                    while (ruc.length() != 11) {
+                        cout << "El RUC debe tener 11 dígitos. Ingrese nuevamente: ";
+                        cin >> ruc;
+                    }
+
+                    // Validar tamaño del teléfono (9 dígitos)
+                    while (telefono < 99999999 or telefono > 999999999) {
+                        cout << "El teléfono debe tener 9 dígitos. Ingrese nuevamente: ";
+                        cin >> telefono;
+                    }
+
+                    c = new ClienteIndividual(email, clave, nombre, telefono, ruc, direccion);
+                    clientes.push_back(c);
+                    
+                    break;
+                }
+
+                default: {
+                    cout << "Ingresó una opción incorrecta" << endl;
+                    break;
+                }
             }
-        }
-
-        // Validar tamaño del RUC (11 dígitos)
-        while (ruc <= 9999999999 or ruc > 99999999999) {
-            cout << "El RUC debe tener 11 dígitos. Ingrese nuevamente: ";
-            cin >> ruc;
-        }
-
-        // Validar tamaño del teléfono (9 dígitos)
-        while (telefono < 99999999 or telefono > 999999999) {
-            cout << "El teléfono debe tener 9 dígitos. Ingrese nuevamente: ";
-            cin >> telefono;
-        }
-
-        if (Cliente::numeroClientes >= 6) {
-            cout << "Agenda llena. No se puede agregar más clientes." << endl;
-            break;
-        }
-
-        c = new ClienteCorporativo(email, clave, nombre, telefono, ruc, direccion);
-        clientes.push_back(c);
-        break;
     }
 
-    case '2': {
-        cout << "Ingrese los datos del cliente individual" << endl;
-        cout << "Email: ";
-        cin >> email;
-        cout << "Clave: ";
-        cin >> clave;
-        cout << "Nombre: ";
-        cin >> nombre;
-        cout << "Telefono: ";
-        cin >> telefono;
-        cout << "Ruc: ";
-        cin >> ruc;
-        cout << "Direccion: ";
-        cin.ignore();
-        getline(cin, direccion);
-
-        c = new ClienteIndividual(email, clave, nombre, telefono, ruc, direccion);
-        clientes.push_back(c);
-        // Validar si el cliente ya está registrado por DNI y Nombre
-        for (auto& it : clientes) {
-            if (it->nombre == nombre) {
-                cout << "El cliente ya existe en la base de datos";
-                return;
-            }
-        }
-
-        // Validar tamaño del RUC (11 dígitos)
-        while (ruc <= 9999999999 or ruc > 99999999999) {
-            cout << "El RUC debe tener 11 dígitos. Ingrese nuevamente: ";
-            cin >> ruc;
-        }
-
-        // Validar tamaño del teléfono (9 dígitos)
-        while (telefono < 99999999 or telefono > 999999999) {
-            cout << "El teléfono debe tener 9 dígitos. Ingrese nuevamente: ";
-            cin >> telefono;
-        }
-
-        if (Cliente::numeroClientes >= 6) {
-            cout << "Agenda llena. No se puede agregar más clientes." << endl;
-            break;
-        }
-        break;
-    }
-
-    default: {
-        cout << "Ingresó una opción incorrecta" << endl;
-        break;
-    }
-    }
+    else 
+        cout << "Agenda llena" << endl;
+    
 }
 
 void buscarCliente(vector<Cliente*>& clientes) {
@@ -350,6 +358,7 @@ void agregarNuevoProducto(vector<Producto>& productos) {
     cout << "Se agregó el nuevo producto." << endl;
 }
 int cont = 0 ;
+
 void realizarVenta(vector<Cliente*>& clientes, vector<Vendedor>& vendedores, vector<Producto>& productos) {
     cont = cont+1;
     int codigoCliente;
@@ -437,10 +446,14 @@ vector <Cliente*> ordenarClientes(vector <Cliente*> x) {
 }
 
 void mostrarClientes(vector <Cliente*>& x) {
+    cout << "|------------------|" << "------------------|" << endl;
+    cout << "|      Codigo      |" << "      Nombre      |" <<endl;
+    cout << "|------------------|" << "------------------|" << endl; 
     x = ordenarClientes(x);
     for(auto i : x) {
-        cout << " -----Codigo-----";
-        cout << i;
+        
+        cout <<"|       "<< i->codigo  <<"       |"<< " "<< i->nombre  <<"         |"<<endl;
+        cout << "|------------------|" << "------------------|" <<endl;
     }
 }
 
@@ -475,9 +488,9 @@ int main() {
     vector<Vendedor> vendedores;
     vector<Producto> productos;
 
-    Cliente* c1 = new ClienteIndividual("cliente1@example.com", "clave1", "Cliente 1", 123456789, 12345, "Dirección 1");
-    Cliente* c2 = new ClienteCorporativo("cliente2@example.com", "clave2", "Cliente 2", 987654321, 54321, "Dirección 2");
-    Cliente* c3 = new ClienteIndividual("cliente3@example.com", "clave3", "Cliente 3", 955987654, 12345, "Dirección 3");
+    Cliente* c1 = new ClienteIndividual("cliente1@example.com", "clave1", "Cliente 1", 123456789, "12345", "Dirección 1");
+    Cliente* c2 = new ClienteCorporativo("cliente2@example.com", "clave2", "Cliente 2", 987654321, "54321", "Dirección 2");
+    Cliente* c3 = new ClienteIndividual("cliente3@example.com", "clave3", "Cliente 3", 955987654, "12345", "Dirección 3");
 
     clientes.push_back(c3);
     clientes.push_back(c1);
@@ -497,7 +510,6 @@ int main() {
         cout << "9. SALIR\n" << endl;
         cout << "Ingrese la opción a realizar: ";
         opcion = obtenerOpcion();
-        limpiarPantalla();
 
         switch (opcion) {
         case 1:
@@ -532,8 +544,6 @@ int main() {
         }
 
         cout << endl;
-        system("pause");
-        limpiarPantalla();
     } while (opcion != 9);
 
     return 0;
