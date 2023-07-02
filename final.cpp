@@ -446,14 +446,14 @@ vector <Cliente*> ordenarClientes(vector <Cliente*> x) {
 }
 
 void mostrarClientes(vector <Cliente*>& x) {
-    cout << "|------------------|" << "------------------|" << endl;
-    cout << "|      Codigo      |" << "      Nombre      |" <<endl;
-    cout << "|------------------|" << "------------------|" << endl; 
+    cout << "|------------------|" << "--------------------|" << "-----------------|" <<endl;
+    cout << "|      Codigo      |" << "      Telefono      |" << "    Categoria    |" << endl;
+    cout << "|------------------|" << "--------------------|" << "-----------------|" << endl; 
     x = ordenarClientes(x);
     for(auto i : x) {
         
-        cout <<"|       "<< i->codigo  <<"       |"<< " "<< i->nombre  <<"         |"<<endl;
-        cout << "|------------------|" << "------------------|" <<endl;
+        cout <<"|       "<< i->codigo  <<"       |"<< "     "<< i->telefono  <<"      |" <<"        "<< i->categoria  <<"        |" <<endl;
+        cout << "|------------------|" << "--------------------|" << "-----------------|" <<endl;
     }
 }
 
