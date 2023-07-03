@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <fstream>
 #include <time.h>
+#include <iomanip>
 
 using namespace std;
 
@@ -14,17 +15,19 @@ class Persona {
 private:
     string email;
     string clave;
-
+    
 public:
+    int dni;
     int codigo;
     string nombre;
     int telefono;
 
     Persona() {}
-    Persona(string email, string clave, string nombre, int telefono) {
+    Persona(string email, string clave, string nombre,int dni, int telefono) {
         this->email = email;
         this->clave = clave;
         this->nombre = nombre;
+        this->dni = dni;
         this->telefono = telefono;
     }
 };
@@ -66,7 +69,7 @@ public:
     string direccion;
 
     Cliente() {}
-    Cliente(string email, string clave, string nombre, int telefono, string ruc, string direccion) : Persona(email, clave, nombre, telefono) {
+    Cliente(string email, string clave, string nombre, int dni, int telefono, string ruc, string direccion) : Persona(email, clave, nombre, dni, telefono) {
         this->categoria = 'C';
         this->ruc = ruc;
         this->direccion = direccion;
@@ -95,7 +98,7 @@ int Cliente::numeroClientes = 0;
 class ClienteIndividual : public Cliente {
 public:
     ClienteIndividual() {}
-    ClienteIndividual(string email, string clave, string nombre, int telefono, string ruc, string direccion) : Cliente(email, clave, nombre, telefono, ruc, direccion) {
+    ClienteIndividual(string email, string clave, string nombre,int dni, int telefono, string ruc, string direccion) : Cliente(email, clave, nombre,dni, telefono, ruc, direccion) {
         this->tasaDescuento = 0.03;
     }
 
@@ -111,7 +114,7 @@ public:
 class ClienteCorporativo : public Cliente {
 public:
     ClienteCorporativo() {}
-    ClienteCorporativo(string email, string clave, string nombre, int telefono, string ruc, string direccion) : Cliente(email, clave, nombre, telefono, ruc, direccion) {
+    ClienteCorporativo(string email, string clave, string nombre,int dni, int telefono, string ruc, string direccion) : Cliente(email, clave, nombre, dni,telefono, ruc, direccion) {
         this->tasaDescuento = 0.10;
     }
 
@@ -130,8 +133,7 @@ private:
 public:
     double salario;
 
-    Vendedor(int codigo, string nombre, double salario) {
-        this->codigo = codigo;
+    Vendedor(string nombre, double salario) {
         this->nombre = nombre;
         this->salario = salario;
         numeroVendedores += 1;
@@ -157,6 +159,7 @@ int obtenerOpcion() {
             cout << "Opción inválida. Intente nuevamente: ";
             cin.clear();
             cin.ignore(10000, '\n');
+            cout << "\033[2J\033[1;1H";
         }
     }
 
@@ -174,7 +177,8 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
     string ruc;
     string direccion;
     int dni;
-    if (Cliente::numeroClientes <= 6)
+
+    if (Cliente::numeroClientes < 6)
     {
         cout << "Elija el tipo de cliente" << endl;
             cout << "1. Cliente Corporativo" << endl;
@@ -203,7 +207,7 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
 
                     // Validar si el cliente ya está registrado por DNI y Nombre
                     for (auto& it : clientes) {
-                        if (it->nombre == nombre) {
+                        if (it->nombre == nombre and it->dni == dni) {
                             cout << "El cliente ya existe en la base de datos";
                             return;
                         }
@@ -226,7 +230,7 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
                         break;
                     }
                     
-                    c = new ClienteCorporativo(email, clave, nombre, telefono, ruc, direccion);
+                    c = new ClienteCorporativo(email, clave, nombre,dni, telefono, ruc, direccion);
                     clientes.push_back(c);
                     break;
                 }
@@ -250,7 +254,7 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
 
                     // Validar si el cliente ya está registrado por DNI y Nombre
                     for (auto& it : clientes) {
-                        if (it->nombre == nombre) {
+                        if (it->nombre == nombre and it->dni == dni) {
                             cout << "El cliente ya existe en la base de datos";
                             return;
                         }
@@ -268,7 +272,7 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
                         cin >> telefono;
                     }
 
-                    c = new ClienteIndividual(email, clave, nombre, telefono, ruc, direccion);
+                    c = new ClienteIndividual(email, clave, nombre, dni,telefono, ruc, direccion);
                     clientes.push_back(c);
                     
                     break;
@@ -323,14 +327,13 @@ void agregarNuevoVendedor(vector<Vendedor>& vendedores) {
 
     if (vendedorExistente) {
         cout << "Error, vendedor ya registrado" << endl;
+
     } else {
         int codigo;
         double salario;
-        cout << "Ingrese el codigo del vendedor: ";
-        cin >> codigo;
         cout << "Ingrese el salario del vendedor: ";
         cin >> salario;
-        Vendedor nuevoVendedor(codigo, nombre, salario);
+        Vendedor nuevoVendedor(nombre, salario);
         vendedores.push_back(nuevoVendedor);
         cout << "Se agregó el nuevo vendedor: " << nuevoVendedor.nombre << endl;
     }
@@ -404,7 +407,7 @@ void realizarVenta(vector<Cliente*>& clientes, vector<Producto>& productos) {
         return;
     }
 
-    cout << "Ingrese la cantidad que desea comprar" << endl;
+    cout << "Ingrese la cantidad que desea comprar: ";
     cin >> cantidad;
 
     if (cantidad <= producto->stock) {
@@ -419,25 +422,32 @@ void realizarVenta(vector<Cliente*>& clientes, vector<Producto>& productos) {
     }
 
 
-    if(confirmar == 'S' or confirmar == 's') {
-        ventas += 1;
-        time_t t = time(NULL);
-        cout << "Realizando venta..." << endl;
-        cliente->agregarCompra(producto);
+        if(confirmar == 'S' || confirmar == 's') {
+            ventas += 1;
+            time_t t = time(NULL);
+            cout << "Realizando venta..." << endl;
+            cliente->agregarCompra(producto);
 
-        cout << "\n                   Venta "<< ventas << endl ;
-        cout << "FECHA Y HORA: " << ctime(&t) << endl;
+            cout << "\n                                          Venta "<< ventas << endl ;
+            cout << "FECHA Y HORA: " << ctime(&t) << endl;
 
-        cout << "COD                PRODUCTO                  CANTIDAD                  PRECIO UNI.       SUBTOTAL" << endl;
+            cout << left << setw(20) << "COD"
+                << setw(30) << "PRODUCTO"
+                << setw(20) << "CANTIDAD"
+                << setw(20) << "PRECIO UNI."
+                << setw(20) << "SUBTOTAL" << endl;
 
-        for(auto& p : cliente->getCompras()) {
-            double subtotal = 0;
-            subtotal = p->precio*cantidad;
+            for(auto& p : cliente->getCompras()) {
+                double subtotal = p->precio * cantidad;
+                cout << left << setw(20) << p->codigo
+                    << setw(30) << p->descripcion
+                    << setw(20) << cantidad
+                    << setw(20) << p->precio
+                    << subtotal << endl;
+                total += subtotal;
+            }
+        
 
-            cout << p->codigo << "               " << p->descripcion << "                  " << cantidad << "                  " << p->precio << "       " << subtotal << endl;
-            total += subtotal;
- 
-        }
 
         cout << "\nTOTAL " << total << " SOLES" << endl;
 
@@ -504,20 +514,24 @@ void mostrarProductos(const vector<Producto>& productos) {
     cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
 
     for(const auto& producto : productos) {
-        cout << "|        " << producto.codigo << "     |" << "      " << producto.descripcion << "       |"<<"          " << producto.precio << "       |" << endl;
-        cout << "|-----------------------------|" << "---------------------------|" << "---------------------|" << endl;
+        cout << "| " << setw(12) << left << producto.codigo << " |" 
+             << setw(27) << left << producto.descripcion << " |" 
+             << setw(19) << left << producto.precio << " |" << endl;
+        cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
     }
 }
 
 
 void mostrarVendedores(const vector<Vendedor>& vendedores) {
-    cout << "+--------------+" << "----------------------------+" << "---------------------+" <<endl;
-    cout << "|   Codigo     |" << "          Nombre            |" << "       Salario       |" <<endl;
-    cout << "+--------------+" << "----------------------------+" << "---------------------+" <<endl;
+    cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
+    cout << "|   Codigo     |" << "          Nombre            |" << "       Salario       |" << endl;
+    cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
 
     for (const auto& vendedor : vendedores) {
-        cout << "|     "<< vendedor.codigo << "     |"<< "      "<<vendedor.nombre << "              |"<< "       " << vendedor.salario << "        |"<<endl;
-        cout << "+--------------+" << "----------------------------+" << "---------------------+" << "--------------+" << endl;
+        cout << "| " << setw(12) << right << vendedor.codigo << " |" 
+             << setw(27) << left << vendedor.nombre << " |" 
+             << setw(19) << right << vendedor.salario << " |" << endl;
+        cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
     }
 }
 
@@ -529,14 +543,13 @@ int main() {
     vector<Vendedor> vendedores;
     vector<Producto> productos;
 
-    Cliente* c1 = new ClienteIndividual("cliente1@example.com", "clave1", "Cliente 1", 123456789, "12345678921", "Dirección 1");
-    Cliente* c2 = new ClienteCorporativo("cliente2@example.com", "clave2", "Cliente 2", 987654321,"54321678912", "Dirección 2");
-    Cliente* c3 = new ClienteIndividual("cliente3@example.com", "clave3", "Cliente 3", 955987654, "12345567892", "Dirección 3");
+    Cliente* c1 = new ClienteIndividual("cliente1@example.com", "clave1", "Cliente 1",72685492, 123456789, "12345678921", "Dirección 1");
+    Cliente* c2 = new ClienteCorporativo("cliente2@example.com", "clave2", "Cliente 2",72685493, 987654321,"54321678912", "Dirección 2");
+    Cliente* c3 = new ClienteIndividual("cliente3@example.com", "clave3", "Cliente 3", 72685494, 938483007, "12345567892", "Dirección 3");
 
     Producto producto1("Martillo", 10.99, "Ferreteria", 50, 0);
     Producto producto2("Destornillador", 5.99, "Ferreteria", 100, 0);
     Producto producto3("Taladro", 59.99, "Ferreteria", 20, 0);
-
 
     clientes.push_back(c3);
     clientes.push_back(c1);
