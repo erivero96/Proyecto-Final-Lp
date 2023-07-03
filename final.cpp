@@ -220,7 +220,7 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
                     }
 
                     // Validar tamaño del teléfono (9 dígitos)
-                    while (telefono < 99999999 or telefono > 999999999) {
+                    while (telefono < 100000000 or telefono > 999999999) {
                         cout << "El teléfono debe tener 9 dígitos. Ingrese nuevamente: ";
                         cin >> telefono;
                     }
@@ -267,7 +267,7 @@ void agregarNuevoCliente(vector<Cliente*>& clientes) {
                     }
 
                     // Validar tamaño del teléfono (9 dígitos)
-                    while (telefono < 99999999 or telefono > 999999999) {
+                    while (telefono < 100000000 or telefono > 999999999) {
                         cout << "El teléfono debe tener 9 dígitos. Ingrese nuevamente: ";
                         cin >> telefono;
                     }
