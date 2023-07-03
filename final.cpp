@@ -37,8 +37,8 @@ public:
     static int numeroProductos;
 
     Producto() {}
-    Producto(int codigo, string descripcion, double precio, string tipo, int stock, int capacidad) {
-        this->codigo = codigo;
+    Producto(string descripcion, double precio, string tipo, int stock, int capacidad) {
+        numeroProductos +=1;
         this->descripcion = descripcion;
         this->precio = precio;
         this->tipo = tipo;
@@ -54,7 +54,7 @@ int Producto::numeroProductos = 0;
 class Cliente : public Persona {
 protected:
     double tasaDescuento;
-    vector <Producto> productos;
+    vector <Producto*> productos;
 
 public:
 
@@ -77,7 +77,7 @@ public:
         return o;
     }
 
-    Cliente& agregarCompra(Producto& x) {
+    Cliente& agregarCompra(Producto* x) {
         productos.push_back(x);
         return *this;
     }
@@ -338,8 +338,6 @@ void agregarNuevoProducto(vector<Producto>& productos) {
     int stock;
     int capacidad;
 
-    cout << "Ingrese el código del producto: ";
-    cin >> codigo;
     cout << "Ingrese la descripción del producto: ";
     cin.ignore();
     getline(cin, descripcion);
@@ -353,15 +351,15 @@ void agregarNuevoProducto(vector<Producto>& productos) {
     cout << "Ingrese la capacidad del producto: ";
     cin >> capacidad;
 
-    Producto nuevoProducto(codigo, descripcion, precio, tipo, stock, capacidad);
+    Producto nuevoProducto(descripcion, precio, tipo, stock, capacidad);
     productos.push_back(nuevoProducto);
     cout << "Se agregó el nuevo producto." << endl;
 }
 int cont = 0 ;
 
 void realizarVenta(vector<Cliente*>& clientes, vector<Producto>& productos) {
-    cont = cont+1;
     int codigoCliente;
+    char confirmar;
     cout << "Ingrese el código del cliente: ";
     cin >> codigoCliente;
 
@@ -399,23 +397,32 @@ void realizarVenta(vector<Cliente*>& clientes, vector<Producto>& productos) {
         return;
     }
 
-    cout << "Realizando venta..." << endl;
+    cout << "Desea confirmar la compra S/N: ";
+    cin >> confirmar;
 
+    if(confirmar == 'S' or confirmar == 's') {
+        cout << "Realizando venta..." << endl;
+        cliente->agregarCompra(producto);
 
-    ofstream archivo("venta.txt");
-    if (archivo.is_open())
-    {
-        archivo<<"Venta"<<cont<<endl;
-        archivo<<"Cliente"<<cliente->nombre<<endl;
-        archivo<<"Fecha 28/06/2023"<<endl;
-        archivo<<"Cod"<<codigoProducto<<endl;
-        archivo<<"Producto"<<producto->descripcion<<endl;
-        archivo.close();
+        ofstream archivo("venta.txt");
+        if (archivo.is_open())
+        {
+            archivo<<"Venta"<<cont<<endl;
+            archivo<<"Cliente"<<cliente->nombre<<endl;
+            archivo<<"Fecha 28/06/2023"<<endl;
+            archivo<<"Cod"<<codigoProducto<<endl;
+            archivo<<"Producto"<<producto->descripcion<<endl;
+            archivo.close();
+        }
+        else
+        {
+            cout<<"No se pudo abrir el archivo"<<endl;
+        }
     }
-    else
-    {
-        cout<<"No se pudo abrir el archivo"<<endl;
-    }   
+
+    else 
+        cout << "La compra no ha sido procesada"<< endl;
+    
 }
 bool compararClientes(const Cliente* x1, const Cliente* x2) {
     return x1->codigo < x2->codigo;
@@ -489,9 +496,18 @@ int main() {
     Cliente* c2 = new ClienteCorporativo("cliente2@example.com", "clave2", "Cliente 2", 987654321,"54321678912", "Dirección 2");
     Cliente* c3 = new ClienteIndividual("cliente3@example.com", "clave3", "Cliente 3", 955987654, "12345567892", "Dirección 3");
 
+    Producto producto1("Martillo", 10.99, "Ferreteria", 50, 0);
+    Producto producto2("Destornillador", 5.99, "Ferreteria", 100, 0);
+    Producto producto3("Taladro", 59.99, "Ferreteria", 20, 0);
+
+
     clientes.push_back(c3);
     clientes.push_back(c1);
     clientes.push_back(c2);
+
+    productos.push_back(producto1);
+    productos.push_back(producto2);
+    productos.push_back(producto3);
 
     int opcion;
     do {
