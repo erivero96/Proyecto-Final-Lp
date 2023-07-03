@@ -608,6 +608,7 @@ int main() {
             break;
         case 8:
             mostrarProductos(productos);
+            break;
         case 9:
             cout << "Saliendo del programa..." << endl;
             break;
