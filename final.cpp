@@ -499,8 +499,9 @@ bool compararPorCodigo(const T& x1, const T& x2) {
 }
 
 template <typename T> 
-void ordenarListaAscendente(vector <T> x) {
-    sort(x.begin(), x.end(), compararPorCodigo);
+vector<T> ordenarListaAscendente(vector <T> x) {
+    sort(x.begin(), x.end(), compararPorCodigo<T>);
+    return x;
 }
 
 template <typename T> 
@@ -523,11 +524,11 @@ void mostrarProductos(vector<Producto>& productos) {
     }
 }
 
-void mostrarVendedores(const vector<Vendedor>& vendedores) {
+void mostrarVendedores(vector<Vendedor>& vendedores) {
     cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
     cout << "|   Codigo     |" << "          Nombre            |" << "       Salario       |" << endl;
     cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
-
+    vendedores = ordenarListaAscendente<Vendedor>(vendedores);
     for (const auto& vendedor : vendedores) {
         cout << "| " << setw(12) << right << vendedor.codigo << " |" 
              << setw(27) << left << vendedor.nombre << " |" 
@@ -552,6 +553,10 @@ int main() {
     Producto producto2("Destornillador", 5.99, "Ferreteria", 100, 0);
     Producto producto3("Taladro", 59.99, "Ferreteria", 20, 0);
 
+    Vendedor vendedor1("Jose", 1000);
+    Vendedor vendedor2("Juan", 1400);
+    Vendedor vendedor3("Maria", 1200);
+
     clientes.push_back(c3);
     clientes.push_back(c1);
     clientes.push_back(c2);
@@ -559,6 +564,10 @@ int main() {
     productos.push_back(producto1);
     productos.push_back(producto2);
     productos.push_back(producto3);
+
+    vendedores.push_back(vendedor2);
+    vendedores.push_back(vendedor1);
+    vendedores.push_back(vendedor3);
 
     int opcion;
     do {
