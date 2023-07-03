@@ -121,6 +121,7 @@ public:
     void asignarCategoria() {
         cout << "Ingrese la categoria: ";
         while(categoria != 'A' or categoria !='B' ){
+            cout << "Cliente Corporativo solo puede ser categoria A o B" << endl;
             cin >> categoria;
         }
     }
@@ -503,16 +504,17 @@ void ordenarListaAscendente(vector <T> x) {
 }
 
 template <typename T> 
-void ordenarListaDescendente(vector <T> x) {
-    sort(x.end(), x.begin() , compararPorCodigo);
+vector <T> ordenarListaDescendente(vector <T> x) {
+    sort(x.rbegin(), x.rend() , compararPorCodigo<T>);
+    return x;
 }
 
 
-void mostrarProductos(const vector<Producto>& productos) {
+void mostrarProductos(vector<Producto>& productos) {
     cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
     cout << "|   Codigo     |" << "        Descripcion         |" << "         Precio      |" << endl;
     cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
-
+    productos = ordenarListaDescendente<Producto>(productos);
     for(const auto& producto : productos) {
         cout << "| " << setw(12) << left << producto.codigo << " |" 
              << setw(27) << left << producto.descripcion << " |" 
@@ -520,7 +522,6 @@ void mostrarProductos(const vector<Producto>& productos) {
         cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
     }
 }
-
 
 void mostrarVendedores(const vector<Vendedor>& vendedores) {
     cout << "+--------------+" << "----------------------------+" << "---------------------+" << endl;
