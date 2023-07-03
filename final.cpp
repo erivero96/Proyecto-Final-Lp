@@ -434,7 +434,7 @@ void realizarVenta(vector<Cliente*>& clientes, vector<Producto>& productos) {
             double subtotal = 0;
             subtotal = p->precio*cantidad;
 
-            cout << p->codigo << "                " << p->descripcion << "                  " << cantidad << "                  " << p->precio << "       " << subtotal << endl;
+            cout << p->codigo << "               " << p->descripcion << "                  " << cantidad << "                  " << p->precio << "       " << subtotal << endl;
             total += subtotal;
  
         }
