@@ -4,8 +4,11 @@
 #include <vector>
 #include <algorithm>
 #include <fstream>
+#include <time.h>
 
 using namespace std;
+
+int ventas = 0;
 
 class Persona {
 private:
@@ -57,7 +60,6 @@ protected:
     vector <Producto*> productos;
 
 public:
-
     static int numeroClientes;
     char categoria;
     string ruc;
@@ -82,6 +84,10 @@ public:
         return *this;
     }
     virtual void asignarCategoria() = 0;
+
+    vector<Producto*> getCompras() {
+        return productos;
+    }
 };
 
 int Cliente::numeroClientes = 0;
@@ -358,7 +364,8 @@ void agregarNuevoProducto(vector<Producto>& productos) {
 int cont = 0 ;
 
 void realizarVenta(vector<Cliente*>& clientes, vector<Producto>& productos) {
-    int codigoCliente;
+    int codigoCliente, cantidad;
+    double total = 0;
     char confirmar;
     cout << "Ingrese el código del cliente: ";
     cin >> codigoCliente;
@@ -397,12 +404,42 @@ void realizarVenta(vector<Cliente*>& clientes, vector<Producto>& productos) {
         return;
     }
 
-    cout << "Desea confirmar la compra S/N: ";
-    cin >> confirmar;
+    cout << "Ingrese la cantidad que desea comprar" << endl;
+    cin >> cantidad;
+
+    if (cantidad <= producto->stock) {
+        cout << "Desea confirmar la compra S/N: ";
+        cin >> confirmar;
+    }
+
+    else {
+        cout << "No contamos con stock suficiente para su compra :(" << endl;
+        cout << "Stock Disponible: " << producto->stock << endl;
+        return;
+    }
+
 
     if(confirmar == 'S' or confirmar == 's') {
+        ventas += 1;
+        time_t t = time(NULL);
         cout << "Realizando venta..." << endl;
         cliente->agregarCompra(producto);
+
+        cout << "\n                   Venta "<< ventas << endl ;
+        cout << "FECHA Y HORA: " << ctime(&t) << endl;
+
+        cout << "COD                PRODUCTO                  CANTIDAD                  PRECIO UNI.       SUBTOTAL" << endl;
+
+        for(auto& p : cliente->getCompras()) {
+            double subtotal = 0;
+            subtotal = p->precio*cantidad;
+
+            cout << p->codigo << "                " << p->descripcion << "                  " << cantidad << "                  " << p->precio << "       " << subtotal << endl;
+            total += subtotal;
+ 
+        }
+
+        cout << "\nTOTAL " << total << " SOLES" << endl;
 
         ofstream archivo("venta.txt");
         if (archivo.is_open())
